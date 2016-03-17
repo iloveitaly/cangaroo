@@ -2,7 +2,6 @@ module Cangaroo
   module Webhook
     class Client
       include HTTParty
-
       format :json
 
       attr_accessor :connection, :path
