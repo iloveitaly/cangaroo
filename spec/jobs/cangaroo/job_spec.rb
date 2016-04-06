@@ -11,7 +11,7 @@ module Cangaroo
     let(:job_class) { FakeJob }
     let(:destination_connection) { create(:cangaroo_connection) }
     let(:type) { 'orders' }
-    let(:payload) { { id: 'O123' } }
+    let(:payload) { { "id" => 'O123' } }
     let(:connection_response) { parse_fixture('json_payload_connection_response.json') }
 
     let(:options) do
@@ -43,11 +43,12 @@ module Cangaroo
       it 'calls post on client' do
         job.perform
         expect(client).to have_received(:post)
-          .with(job.transform, job.job_id, email: 'info@nebulab.it')
+          .with(job.transform, job.job_id, { email: 'info@nebulab.it' }, an_instance_of(Cangaroo::Translation))
       end
 
       it 'restart the flow' do
         job.perform
+
         expect(Cangaroo::PerformFlow).to have_received(:call)
           .once
           .with(source_connection: destination_connection,
@@ -61,6 +62,31 @@ module Cangaroo
         job.perform
 
         expect(Cangaroo::PerformFlow).to_not have_received(:call)
+      end
+
+      it 'creates a translation record and stores the response' do
+        job.perform
+
+        translation = Cangaroo::Translation.find_by(job_id: job.job_id)
+
+        expect(translation).to_not be_nil
+        expect(translation.successful?).to eq(true)
+        expect(translation.destination_connection).to eq(destination_connection)
+        expect(translation.object_type).to eq('orders')
+        expect(translation.object_key).to eq('id')
+        expect(translation.object_id).to eq('O123')
+      end
+
+      context 'endpoint communication fails' do
+        it 'creates a unsuccessful translation model' do
+          client.stub(:post).and_raise('an error')
+
+          expect { job.perform }.to raise_error
+
+          translation = Cangaroo::Translation.find_by(job_id: job.job_id)
+          expect(translation).to_not be_nil
+          expect(translation.successful?).to eq(false)
+        end
       end
 
       context 'endpoint provides a empty response' do
