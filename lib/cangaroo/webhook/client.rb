@@ -12,7 +12,7 @@ module Cangaroo
         @path = path
       end
 
-      def post(payload, request_id, parameters)
+      def post(payload, request_id, parameters, translation = nil)
         request_body = body(payload, request_id, parameters).to_json
 
         request_options = {
@@ -32,6 +32,14 @@ module Cangaroo
         req = self.class.post(url, request_options)
 
         sanitized_response = sanitize_response(req)
+
+        if translation.present?
+          Cangaroo::Attempt.create!(
+            translation: translation,
+            response_code: req.response.code,
+            response: (req.parsed_response['summary'] rescue req.response)
+          )
+        end
 
         if %w(200 201 202 204).include?(req.response.code)
           sanitized_response
