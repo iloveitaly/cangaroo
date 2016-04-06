@@ -37,7 +37,7 @@ module Cangaroo
           Cangaroo::Attempt.create!(
             translation: translation,
             response_code: req.response.code,
-            response: (req.parsed_response['summary'] rescue req.response)
+            response: sanitized_response
           )
         end
 
