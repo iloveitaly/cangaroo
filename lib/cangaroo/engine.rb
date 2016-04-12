@@ -13,7 +13,9 @@ module Cangaroo
       Rails.configuration.cangaroo = ActiveSupport::OrderedOptions.new
       Rails.configuration.cangaroo.jobs = []
       Rails.configuration.cangaroo.poll_jobs = []
+      Rails.configuration.cangaroo.process_response = true
       Rails.configuration.cangaroo.basic_auth = false
+      Rails.configuration.cangaroo.payload_keys = ['id']
     end
   end
 end
