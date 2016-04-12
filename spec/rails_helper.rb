@@ -39,6 +39,7 @@ RSpec.configure do |config|
   # reset config before each spec
   config.before(:each) do
     Rails.configuration.cangaroo.basic_auth = false
+    Rails.configuration.cangaroo.process_response = true
     Rails.configuration.cangaroo.jobs = []
     Rails.configuration.cangaroo.poll_job = []
   end
