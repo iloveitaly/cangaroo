@@ -1,5 +1,6 @@
 module Cangaroo
   class Job < ActiveJob::Base
+    include Cangaroo::Log
     include Cangaroo::ClassConfiguration
 
     queue_as :cangaroo
@@ -47,11 +48,16 @@ module Cangaroo
           translation.object_key = 'internal_id'
           translation.object_id = self.payload['internal_id']
         else
-          # TODO log
+          log.info 'unable to find primary key', translation: translation
         end
 
         translation.save!
       end
+
+      log.info 'attempting translation',
+        destination_connection: destination_connection.name,
+        path: path,
+        translation: translation
 
       response = Cangaroo::Webhook::Client.new(destination_connection, path)
         .post(transform, @job_id, parameters, translation)
@@ -66,6 +72,11 @@ module Cangaroo
       return if response.blank?
 
       unless self.process_response
+        return
+      end
+
+      if response.blank?
+        log.info 'blank response; not processing'
         return
       end
 
