@@ -6,8 +6,7 @@ require 'securerandom'
 
 require 'cangaroo'
 
-database_path = File.expand_path('../../../tmp/cangaroo_test.sqlite3', __FILE__)
-ENV['DATABASE_URL'] = "sqlite3://#{database_path}"
+ENV['DATABASE_URL'] = "postgres:///cangaroo_test"
 
 # Initialize our test app
 
