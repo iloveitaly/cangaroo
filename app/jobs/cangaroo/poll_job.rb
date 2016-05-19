@@ -11,7 +11,7 @@ module Cangaroo
     class_configuration :parameters, {}
 
     def perform(*)
-      log.set_context(self)
+      log.set_context(job: self)
 
       current_time = DateTime.now
 
