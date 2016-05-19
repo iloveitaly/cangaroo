@@ -11,6 +11,8 @@ module Cangaroo
     class_configuration :process_response, true
 
     def perform(*)
+      log.set_context(job: self)
+
       restart_flow(connection_request)
     end
 
@@ -26,6 +28,9 @@ module Cangaroo
 
     def connection_request
       # job ID will remain consistent across retries
+
+      # TODO we should move this logic to the translation model
+
       translation = Cangaroo::Translation.where(job_id: @job_id).first_or_initialize(
         # TODO use job in place of destination connection
         # TODO use source job is place of source connection
