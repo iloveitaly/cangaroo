@@ -27,37 +27,7 @@ module Cangaroo
     protected
 
     def connection_request
-      # job ID will remain consistent across retries
-
-      # TODO we should move this logic to the translation model
-
-      translation = Cangaroo::Translation.where(job_id: @job_id).first_or_initialize(
-        # TODO use job in place of destination connection
-        # TODO use source job is place of source connection
-        # ^ this will provide more detail to the user
-
-        source_connection: source_connection,
-        destination_connection: destination_connection,
-
-        object_type: self.type,
-
-        request: self.payload
-      )
-
-      if translation.new_record?
-        if self.payload['id']
-          translation.object_key = 'id'
-          translation.object_id = self.payload['id']
-        elsif self.payload['internal_id']
-          # TODO support dynamic proc based ID search here instead
-          translation.object_key = 'internal_id'
-          translation.object_id = self.payload['internal_id']
-        else
-          log.info 'unable to find primary key', translation: translation
-        end
-
-        translation.save!
-      end
+      translation.save!
 
       log.info 'attempting translation',
         destination_connection: destination_connection.name,
@@ -106,6 +76,24 @@ module Cangaroo
 
     def destination_connection
       @connection ||= Cangaroo::Connection.find_by!(name: connection)
+    end
+
+    def translation
+      # NOTE @job_id will remain consistent across retries
+      # TODO we should move this logic to the translation model
+
+      @translation ||= Cangaroo::Translation.where(job_id: @job_id).first_or_initialize(
+        # TODO use job in place of destination connection
+        # TODO use source job is place of source connection
+        #      ^ this will provide more detail to the user
+
+        source_connection: source_connection,
+        destination_connection: destination_connection,
+
+        object_type: self.type,
+
+        request: self.payload
+      )
     end
   end
 end
