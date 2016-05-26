@@ -1,6 +1,7 @@
 require 'simplecov'
 require 'codeclimate-test-reporter'
 require 'pry-byebug'
+require 'faker'
 
 SimpleCov.start 'rails' do
   add_group 'Commands', 'app/commands'
