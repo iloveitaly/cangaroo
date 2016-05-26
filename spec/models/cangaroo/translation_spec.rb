@@ -7,6 +7,27 @@ RSpec.describe Cangaroo::Translation, type: :model do
     Rails.configuration.cangaroo.payload_keys = ['id', 'order_id']
   end
 
+  describe '#related_translations' do
+    it 'returns other translation of this same object that have been sent through the pipeline' do
+      translation.save!
+
+      previous_translation = FactoryGirl.build(:translation)
+
+      previous_translation.object_type = translation.object_type
+      # copying the request will also copy the ID + key type on save
+      previous_translation.request = translation.request.deep_dup
+      previous_translation.request['another_field'] = Faker::Lorem.word
+      previous_translation.save!
+
+      expect(translation.related_translations).to_not be_empty
+      expect(translation.related_translations.first.id).to eq(previous_translation.id)
+    end
+
+    it 'returns an empty collection when on previous objects exist' do
+      expect(translation.related_translations).to be_empty
+    end
+  end
+
   describe "#object_key" do
     it "chooses the first primary key available" do
       translation.request = {
