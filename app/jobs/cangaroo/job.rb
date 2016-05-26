@@ -24,7 +24,7 @@ module Cangaroo
       { type.singularize => payload }
     end
 
-    protected
+    protected if !Rails.env.test?
 
     def connection_request
       translation.save!
