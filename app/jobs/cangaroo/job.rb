@@ -78,6 +78,16 @@ module Cangaroo
       @connection ||= Cangaroo::Connection.find_by!(name: connection)
     end
 
+    def payload_state
+      other_translation = translation.related_translations.first
+
+      if other_translation.present?
+        :updated
+      else
+        :new
+      end
+    end
+
     def translation
       # NOTE @job_id will remain consistent across retries
       # TODO we should move this logic to the translation model
