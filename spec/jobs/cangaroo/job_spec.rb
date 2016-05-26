@@ -107,5 +107,17 @@ module Cangaroo
     describe '#transform' do
       it { expect(job_class.new(options).transform).to eq('order' => payload) }
     end
+
+    describe '#payload_state' do
+      let(:job) { job_class.new(options) }
+
+      it { expect(job.payload_state).to eq(:new) }
+
+      it 'returns updated when a previous matching payload exists' do
+        allow_any_instance_of(Cangaroo::Translation).to receive(:related_translations).and_return([OpenStruct.new()])
+
+        expect(job.payload_state).to eq(:updated)
+      end
+    end
   end
 end
