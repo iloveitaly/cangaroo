@@ -24,6 +24,16 @@ module Cangaroo
       { type.singularize => payload }
     end
 
+    def payload_state
+      other_translation = translation.related_translations.first
+
+      if other_translation.present?
+        :updated
+      else
+        :new
+      end
+    end
+
     protected if !Rails.env.test?
 
     def connection_request
@@ -76,16 +86,6 @@ module Cangaroo
 
     def destination_connection
       @connection ||= Cangaroo::Connection.find_by!(name: connection)
-    end
-
-    def payload_state
-      other_translation = translation.related_translations.first
-
-      if other_translation.present?
-        :updated
-      else
-        :new
-      end
     end
 
     def translation
