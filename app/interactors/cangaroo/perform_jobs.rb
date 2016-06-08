@@ -23,9 +23,11 @@ module Cangaroo
         else
           # TODO persist translation for audit trail?
 
-          log.info 'skipping payload, no jobs',
+          log.info 'skipping job for payload',
+            skipped_job: job.class.to_s,
             payload: payload,
-            payload_type: type
+            payload_type: type,
+            payload_state: job.payload_state
         end
       end
     end
