@@ -18,8 +18,8 @@ describe Cangaroo::PerformJobs do
   end
 
   describe '.call' do
-    let(:job_a) { double('job_a', perform?: true, enqueue: nil) }
-    let(:job_b) { double('job_b', perform?: false, enqueue: nil) }
+    let(:job_a) { double('job_a', perform?: true, enqueue: nil, payload_state: :new) }
+    let(:job_b) { double('job_b', perform?: false, enqueue: nil, payload_state: :new) }
 
     context 'payload with objects' do
       let(:json_body) { load_fixture('json_payload_ok.json') }
