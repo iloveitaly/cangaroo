@@ -12,7 +12,7 @@ module Cangaroo
           'type': 'array',
           'items': {
             'type': 'object',
-            'required': ['id'],
+            # 'required': ['id'],
             # 'properties': {
             #   'id': {
             #     'type': 'string'
