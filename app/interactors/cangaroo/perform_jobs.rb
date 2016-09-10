@@ -17,17 +17,23 @@ module Cangaroo
 
     def enqueue_jobs(type, payload)
       initialize_jobs(type, payload).each do |job|
+        # TODO roll this into a magic 'job' key
+        log_attributes = {
+          job_class: job.class.to_s,
+          payload_state: job.payload_state,
+          object_type: job.translation.object_type,
+          object_key: job.translation.object_key,
+          object_id: job.translation.object_id
+        }
+
         if job.perform?
-          # TODO log simplified info about payload info is being queued
+          log.info 'job queued', log_attributes
+
           job.enqueue
         else
-          # TODO persist translation for audit trail?
+          # TODO persist translation record for audit trail?
 
-          log.info 'skipping job for payload',
-            skipped_job: job.class.to_s,
-            payload: payload,
-            payload_type: type,
-            payload_state: job.payload_state
+          log.info 'job skipped', log_attributes
         end
       end
     end
