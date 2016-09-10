@@ -34,6 +34,24 @@ module Cangaroo
       end
     end
 
+    def translation
+      # NOTE @job_id will remain consistent across retries
+      # TODO we should move this logic to the translation model
+
+      @translation ||= Cangaroo::Translation.where(job_id: @job_id).first_or_initialize(
+        # TODO use job in place of destination connection
+        # TODO use source job is place of source connection
+        #      ^ this will provide more detail to the user
+
+        source_connection: source_connection,
+        destination_connection: destination_connection,
+
+        object_type: self.type,
+
+        request: self.payload
+      )
+    end
+
     protected if !Rails.env.test?
 
     def connection_request
@@ -86,24 +104,6 @@ module Cangaroo
 
     def destination_connection
       @connection ||= Cangaroo::Connection.find_by!(name: connection)
-    end
-
-    def translation
-      # NOTE @job_id will remain consistent across retries
-      # TODO we should move this logic to the translation model
-
-      @translation ||= Cangaroo::Translation.where(job_id: @job_id).first_or_initialize(
-        # TODO use job in place of destination connection
-        # TODO use source job is place of source connection
-        #      ^ this will provide more detail to the user
-
-        source_connection: source_connection,
-        destination_connection: destination_connection,
-
-        object_type: self.type,
-
-        request: self.payload
-      )
     end
   end
 end
