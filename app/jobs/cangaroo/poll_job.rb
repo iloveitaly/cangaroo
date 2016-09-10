@@ -38,7 +38,7 @@ module Cangaroo
         fail Cangaroo::Webhook::Error, command.message
       end
 
-      log.info 'updating last poll', last_poll: current_time
+      log.info 'updating last poll', last_poll: current_time, last_poll_stamp: current_time.to_i
 
       last_job_poll = Cangaroo::PollTimestamp.for_class(self.class)
       last_job_poll.value = current_time
