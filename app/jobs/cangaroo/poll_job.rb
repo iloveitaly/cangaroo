@@ -7,6 +7,7 @@ module Cangaroo
 
     class_configuration :connection
     class_configuration :frequency, 1.day
+    class_configuration :frequency_adjustment, 0
     class_configuration :path, ''
     class_configuration :parameters, {}
 
@@ -55,7 +56,7 @@ module Cangaroo
     protected
 
       def last_poll_timestamp
-        @last_poll_timestamp ||= Cangaroo::PollTimestamp.for_class(self.class).value
+        @last_poll_timestamp ||= (Cangaroo::PollTimestamp.for_class(self.class).value || Time.at(0).to_datetime) - self.class.frequency_adjustment
       end
 
       def destination_connection
